@@ -60,7 +60,10 @@ def get_arg(arg_name: str, arg_type: Type[ArgType], args: ListArgs) -> ArgType:
         try:
             return arg_type(value)  # type: ignore
         except ValueError:
-            raise ValueError(f"Invalid value for argument '{arg_name}': '{value}'")
+            raise ValueError(
+                f"Invalid value for argument '{arg_name}': '{value}'"
+                " (expected one of: " + ", ".join([el.value for el in arg_type]) + ")"
+            )
 
     if not isinstance(value, arg_type):
         raise TypeError(
