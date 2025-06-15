@@ -63,6 +63,16 @@ async def list_servers(devopness: DevopnessClientAsync, args: ListArgs):
 
 @dataclass
 class CreateServer:
+    """
+    Rules:
+    - DO NOT execute this tool without first confirming with the user which
+      environment ID to use.
+    - DO NOT execute this tool without first confirming with the user all
+      parameters.
+    - BEFORE executing this tool, show to the user all values that will be
+      used to create the server.
+    """
+
     environment_id: int
     credential_id: int
     cloud_service_code: ServerCloudServiceCode
@@ -101,3 +111,57 @@ async def devopness_create_server(
     )
 
     return response.data
+
+
+@dataclass
+class StopServer:
+    """
+    Rules:
+    - DO NOT execute this tool without first confirming with the user which
+      server ID to use.
+    - DO NOT execute this tool without first confirming with the user
+      questioning the user if they want to stop the server.
+    """
+
+    server_id: int
+
+
+async def stop_server(devopness: DevopnessClientAsync, args: ListArgs):
+    await ensure_authenticated(devopness)
+
+    parsed = get_args_from_helper(args, StopServer)
+
+    response = await devopness.servers.stop_server(parsed.server_id)
+
+    return response.data
+
+
+@dataclass
+class DeleteServer:
+    """
+    Rules:
+    - DO NOT execute this tool without first confirming with the user which
+      server ID to use.
+    - DO NOT execute this tool without first confirming with the user
+      questioning the user if they want to delete the server.
+    """
+
+    server_id: int
+    destroy_server_disks: bool = True
+
+
+async def delete_server(devopness: DevopnessClientAsync, args: ListArgs):
+    await ensure_authenticated(devopness)
+
+    parsed = get_args_from_helper(args, DeleteServer)
+
+    response = await devopness.servers.delete_server(
+        parsed.server_id,
+        parsed.destroy_server_disks,
+    )
+
+    return f"""
+    Server deletion initiated.
+    Go to https://app.devopness.com/actions/{response.action_id} page
+    to see the progress.
+    """

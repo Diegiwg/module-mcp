@@ -28,6 +28,8 @@ Operations = Literal[
     "create_server",
     "list_credentials",
     "list_supported_os_versions",
+    "stop_server",
+    "delete_server",
 ]
 
 
@@ -128,27 +130,23 @@ def get_helper(
     if not is_dataclass(args_model):
         raise TypeError("args_model must be a dataclass")
 
-    msg = f"To perform the '{operation}' operation, you must specify the following arguments:"
+    doc = args_model.__doc__ or ""
+    msg = f"{doc}\n\nTo perform the '{operation}' operation, you must specify the following arguments:"
 
     for field in fields(args_model):
         arg_name = field.name
         arg_type = field.type
+        optional_suffix = ""
 
         origin = get_origin(arg_type)
-
         if origin is Union:
             inner_types = get_args(arg_type)
             non_none = [t for t in inner_types if t is not type(None)]
             if len(non_none) == 1:
                 arg_type = non_none[0]
                 optional_suffix = " (optional)"
-            else:
-                optional_suffix = ""
-        else:
-            optional_suffix = ""
 
         type_name = getattr(arg_type, "__name__", str(arg_type))
-
         msg += f"\n- {arg_name}: {type_name}{optional_suffix}"
 
     return msg

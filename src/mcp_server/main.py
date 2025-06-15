@@ -33,9 +33,13 @@ from .services.projects import (
 )
 from .services.servers import (
     CreateServer,
+    DeleteServer,
     ListServers,
+    StopServer,
+    delete_server,
     devopness_create_server,
     list_servers,
+    stop_server,
 )
 from .services.static import list_supported_os_versions, ListSupportedOsVersions
 from .services.credentials import list_credentials, ListCredentials
@@ -103,6 +107,12 @@ def operation_helper(args: dict[str, Any] | None) -> str:
         case "list_supported_os_versions":
             return get_helper(operation, ListSupportedOsVersions)
 
+        case "stop_server":
+            return get_helper(operation, StopServer)
+
+        case "delete_server":
+            return get_helper(operation, DeleteServer)
+
         case _:
             return f"Unknown operation: {args['operation']}"
 
@@ -160,6 +170,12 @@ async def devopness_perform_any_operation(
 
         case "list_supported_os_versions":
             return await list_supported_os_versions(devopness, args)
+
+        case "stop_server":
+            return await stop_server(devopness, args)
+
+        case "delete_server":
+            return await delete_server(devopness, args)
 
         case _:
             return f"Unknown operation: {operation}"
