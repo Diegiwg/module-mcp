@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-server"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["devopness>=1.1.6", "fastmcp>=2.8.0"]
+
+[project.scripts]
+mcp-server = "mcp_server.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcp_server"]
+
+[tool.uv]
+package = true
+
+[[tool.mypy.overrides]]
+module = "mcp_server.*"
+disable_error_code = ["assignment"]
